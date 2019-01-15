@@ -1,28 +1,33 @@
-vector<int> Solution::solve(int A, vector<int> &B) {
-    int mini=INT_MAX;
-    int ind=-1;
-    for(int i=0;i<B.size();i++){
-        if(mini>B[i]){
-            mini=B[i];
-            ind=i;
+int dp[1001][1001];
+int knapsack(int x,const vector<int> &B,const vector<int> &C){
+    int n=C.size();
+    for(int i=0;i<=n;i++){
+        for(int j=0;j<=x;j++){
+            if(i==0)dp[i][j]=1000005;
+            else if(j==0)dp[i][j]=0;
+            else if(j-B[i-1]>=0){
+                if(C[i-1]+dp[i][j-B[i-1]]<dp[i-1][j]){
+                    dp[i][j]=C[i-1]+dp[i][j-B[i-1]];
+                }
+                else{
+                    dp[i][j]=dp[i-1][j];
+                }
+            }    
+            else dp[i][j]=dp[i-1][j];
         }
     }
-    vector<int> lol;
-    int rem=A%mini;
-    int ans=A/mini;
-    //cout<<rem<<"  "<<ans<<endl;
-    int c=0;
-    for(int i=0;i<ind;i++){
-        while(ans&&rem-B[i]+mini>=0){
-            lol.push_back(i);
-            rem=rem-B[i]+mini;
-            ans--;
-            if(rem<=0)break;
-        }
+    return dp[n][x];
+}
+int Solution::solve(const vector<int> &A, const vector<int> &B, const vector<int> &C) {
+    long long int sum=0;
+    int m=0;
+    for(int i=0;i<A.size();i++){
+        m=max(m,A[i]);
+        //sum+=knapsack(A[i],B,C);    
     }
-    while(c<ans){
-        lol.push_back(ind);
-        c++;
-    } 
-    return lol;
+    knapsack(m,B,C);
+    for(int i=0;i<A.size();i++){
+        sum+=dp[C.size()][A[i]];
+    }
+    return sum;
 }
